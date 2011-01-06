@@ -6,6 +6,3 @@
 
  - the modules probably need a better name than Campfire, which is too
    generic and likely to clash with other Campfire implementations
-
- - command line options to override config file location and config
-   variables

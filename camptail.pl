@@ -1,13 +1,28 @@
 use strict;
 use Campfire; # DEPEND
+use Getopt::Long;
 
-my $RCFILE = "$ENV{HOME}/.campfirerc";
+my $rcfile = "$ENV{HOME}/.campfirerc";
 my $host;
 my $auth;
 my $tail = 10; # lines of backlog to show
 my $delay = 15; # delay in seconds between polls
 my $callback = \&print_message;
-read_rcfile($RCFILE) if -e $RCFILE;
+
+Getopt::Long::Configure(qw(bundling pass_through));
+GetOptions('c|config=s' => \$rcfile)
+  or exit 100;
+
+read_rcfile($rcfile) if -e $rcfile;
+
+Getopt::Long::Configure(qw(no_pass_through));
+GetOptions(
+  'h|host=s' => \$host,
+  'a|auth=s' => \$auth,
+  't|tail=i' => \$tail,
+  'd|delay=i' => \$delay,
+  'callback=s' => \&setup_callback,
+) or exit 100;
 
 my $campfire = Campfire->new($host, $auth);
 
@@ -45,4 +60,15 @@ sub read_rcfile {
 
     print $message, "\n";
   }
+}
+
+sub setup_callback {
+  my (undef, $code) = @_;
+  $callback = eval <<EOF;
+  sub {
+    my (\$message, \$room) = \@_;
+    $code
+  }
+EOF
+  $@ and die $@;
 }
