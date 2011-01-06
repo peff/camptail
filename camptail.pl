@@ -8,6 +8,7 @@ my $auth;
 my $tail = 10; # lines of backlog to show
 my $delay = 15; # delay in seconds between polls
 my $callback = \&print_message;
+my $verbose;
 
 Getopt::Long::Configure(qw(bundling pass_through));
 GetOptions('c|config=s' => \$rcfile)
@@ -22,12 +23,14 @@ GetOptions(
   't|tail=i' => \$tail,
   'd|delay=i' => \$delay,
   'callback=s' => \&setup_callback,
+  'v|verbose!' => \$verbose,
 ) or exit 100;
 
 my $campfire = Campfire->new($host, $auth);
 
 my @rooms = $campfire->presence;
 foreach my $room (@rooms) {
+  print STDERR "Monitoring room: ", $room->name, "\n" if $verbose;
   $callback->($_, $room) foreach $room->recent($tail);
 }
 
