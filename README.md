@@ -53,8 +53,8 @@ them on Debian-ish systems with:
 Installation
 ------------
 
-There isn't a build system yet. You can run it from the source directory
-with:
+There is a build system, but it uses my as-yet-unreleased "mfm" makefile
+creation tool. However, you can run it from the source directory with:
 
     perl camptail.pl
 
