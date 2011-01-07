@@ -45,8 +45,8 @@ have to look at the source code for a list of methods.
 Requirements
 ------------
 
-Camptail uses the LWP, XML::Smart, and URI perl modules. You can install
-them on Debian-ish systems with:
+Camptail uses the WWW::Curl, XML::Smart, and URI perl modules. You can
+install them on Debian-ish systems with:
 
     sudo apt-get install libwww-perl libxml-smart-perl liburi-perl
 

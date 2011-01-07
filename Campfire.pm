@@ -3,7 +3,7 @@ use strict;
 use Campfire::Room; # DEPEND
 use Campfire::User; # DEPEND
 use XML::Smart;
-use LWP::UserAgent;
+use WWW::Curl::Easy;
 use URI;
 use Memoize;
 
@@ -11,11 +11,8 @@ sub new {
   my $self = bless {}, shift;
   my $org = shift;
   my $auth = shift;
-  $self->{ua} = LWP::UserAgent->new;
-  $self->{ua}->credentials(
-    "$org.campfirenow.com:443", 'Application',
-    $auth => 'X'
-  );
+  $self->{curl} = WWW::Curl::Easy->new;
+  $self->{curl}->setopt(CURLOPT_USERNAME, $auth);
   $self->{url} = URI->new("https://$org.campfirenow.com");
   return $self;
 }
@@ -36,11 +33,19 @@ sub _get {
   $url->path("$req.xml");
   $url->query_form(@_);
 
-  my $response = $self->{ua}->get($url);
-  $response->is_success
-    or die "unable to fetch $url: " . $response->status_line;
+  my $body;
+  $self->{curl}->setopt(CURLOPT_URL, $url);
+  $self->{curl}->setopt(CURLOPT_WRITEDATA, \$body);
 
-  return XML::Smart->new($response->decoded_content);
+  my $r = $self->{curl}->perform;
+  $r == 0
+    or die join(' ',
+      "unable to fetch $url:",
+      $self->{curl}->strerror($r),
+      $self->{curl}->errbuf
+    );
+
+  return XML::Smart->new($body);
 }
 
 memoize('lookup_user');
