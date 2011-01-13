@@ -10,9 +10,8 @@ use Memoize;
 sub new {
   my $self = bless {}, shift;
   my $org = shift;
-  my $auth = shift;
-  $self->{curl} = WWW::Curl::Easy->new;
-  $self->{curl}->setopt(CURLOPT_USERNAME, $auth);
+  $self->{auth} = shift;
+  $self->{curl} = $self->_new_curl;
   $self->{url} = URI->new("https://$org.campfirenow.com");
   return $self;
 }
@@ -23,6 +22,13 @@ sub presence {
   return unless exists $xml->{rooms}->{room};
   return map { Campfire::Room->new_from_xml($_, $self) }
          @{$xml->{rooms}->{room}};
+}
+
+sub _new_curl {
+  my $self = shift;
+  my $curl = WWW::Curl::Easy->new;
+  $curl->setopt(CURLOPT_USERNAME, $self->{auth});
+  return $curl;
 }
 
 sub _get {
