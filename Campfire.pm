@@ -19,9 +19,12 @@ sub new {
   return $self;
 }
 
-sub presence {
+sub presence { _get_rooms(presence => @_) }
+sub rooms { _get_rooms(rooms => @_) }
+sub _get_rooms {
+  my $type = shift;
   my $self = shift;
-  my $xml = $self->_get('presence');
+  my $xml = $self->_get($type);
   return unless exists $xml->{rooms}->{room};
   return map { Campfire::Room->new_from_xml($_, $self) }
          @{$xml->{rooms}->{room}};
