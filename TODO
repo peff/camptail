@@ -1,7 +1,3 @@
- - we currently poll all rooms at a fixed interval. We should use the
-   streaming API, but that will probably mean using threads, one per
-   room.
-
  - document campfire api objects
 
  - the modules probably need a better name than Campfire, which is too
