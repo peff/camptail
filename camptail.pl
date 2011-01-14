@@ -32,14 +32,11 @@ my @rooms = $campfire->presence;
 foreach my $room (@rooms) {
   print STDERR "Monitoring room: ", $room->name, "\n" if $verbose;
   $callback->($_, $room) foreach $room->recent($tail);
+  $room->stream($callback);
 }
 
-while (1) {
-  sleep($delay);
-  foreach my $room (@rooms) {
-    $callback->($_, $room) foreach $room->recent;
-  }
-}
+$campfire->run_streams;
+
 exit 0;
 
 sub read_rcfile {

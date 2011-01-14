@@ -30,4 +30,27 @@ sub recent {
   return @messages;
 }
 
+sub stream {
+  my $self = shift;
+  my $cb = shift;
+  my $buffer;
+  $self->{parent}->_stream(
+    join('/', 'room', $self->id, 'live.xml'),
+    sub { $self->_stream_cb($cb, \$buffer, @_) }
+  );
+}
+
+sub _stream_cb {
+  my ($self, $cb, $buffer, $new) = @_;
+
+  $$buffer .= $new;
+  while ($$buffer =~ s{^\s*(<message>.*?\n</message>)\n}{}s) {
+    my $xml = XML::Smart->new($1);
+    $cb->(
+      Campfire::Message->new_from_xml($xml->{message}, $self->{parent}),
+      $self
+    );
+  }
+}
+
 1;
