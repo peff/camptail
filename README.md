@@ -42,6 +42,45 @@ differently, or performing some other action.
 The message and room objects are currently not well documented; you'll
 have to look at the source code for a list of methods.
 
+Example
+-------
+
+My `.camptailrc` file looks something like this:
+
+    # Your campfire host, as in myorg.campfirenow.com
+    $host = 'myorg';
+
+    # Your auth token from campfire. I keep mine separate from the rc
+    # file so I can tweak the permissions but still show people this
+    # file.
+    chomp($auth = `cat ~/.campfire-auth`);
+
+    # Notify via libnotify
+    sub notify {
+      my ($message, $summary) = @_;
+      system(qw(notify-send), $summary, $message);
+    }
+
+    $callback = sub {
+      my ($message, $room) = @_;
+
+      # Messages mentioning me are important. Let's notify, but
+      # also print the message to stdout, so we can get a running tail
+      # of interesting messages.
+      if ($message->body =~ /peff/i) {
+        notify($message, "you were mentioned by " . $message->name);
+        print_message(@_);
+      }
+      # As are ones in this important room, assuming they contain actual
+      # content (and not a timestamp, somebody leaving or entering,
+      # etc).
+      elsif ($room->name eq 'Important Room') {
+        return unless $message->type eq 'TextMessage';
+        notify($message, 'important room message');
+        print_message(@_);
+      }
+    }
+
 Requirements
 ------------
 
