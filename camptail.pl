@@ -6,7 +6,6 @@ my $rcfile = "$ENV{HOME}/.campfirerc";
 my $host;
 my $auth;
 my $tail = 10; # lines of backlog to show
-my $delay = 15; # delay in seconds between polls
 my $callback = \&print_message;
 my $verbose;
 
@@ -21,7 +20,6 @@ GetOptions(
   'h|host=s' => \$host,
   'a|auth=s' => \$auth,
   't|tail=i' => \$tail,
-  'd|delay=i' => \$delay,
   'callback=s' => \&setup_callback,
   'v|verbose!' => \$verbose,
 ) or exit 100;
