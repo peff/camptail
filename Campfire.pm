@@ -5,6 +5,7 @@ use Campfire::User; # DEPEND
 use XML::Smart;
 use WWW::Curl::Easy;
 use WWW::Curl::Multi;
+use WWW::Curl::Form;
 use URI;
 use Memoize;
 
@@ -47,6 +48,7 @@ sub _get {
 
   my $body;
   $self->{curl}->setopt(CURLOPT_URL, $url);
+  $self->{curl}->setopt(CURLOPT_POST, 0);
   $self->{curl}->setopt(CURLOPT_WRITEDATA, \$body);
 
   my $r = $self->{curl}->perform;
@@ -58,6 +60,33 @@ sub _get {
     );
 
   return XML::Smart->new($body);
+}
+
+sub _post {
+  my $self = shift;
+  my $req = shift;
+
+  my $url = $self->{url}->clone;
+  $url->path("$req.xml");
+
+  my $form = WWW::Curl::Form->new;
+  while (@_) {
+    my $k = shift; my $v = shift;
+    $form->formadd($k => $v);
+  }
+
+  my $body;
+  $self->{curl}->setopt(CURLOPT_URL, $url);
+  $self->{curl}->setopt(CURLOPT_HTTPPOST, $form);
+  $self->{curl}->setopt(CURLOPT_WRITEDATA, \$body);
+
+  my $r = $self->{curl}->perform;
+  $r == 0
+    or die join(' ',
+      "unable to post to $url:",
+      $self->{curl}->strerror($r),
+      $self->{curl}->errbuf
+    );
 }
 
 sub _stream {
