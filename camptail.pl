@@ -8,6 +8,7 @@ my $auth;
 my $tail = 10; # lines of backlog to show
 my $callback = \&print_message;
 my $verbose;
+my @want_rooms;
 
 Getopt::Long::Configure(qw(bundling pass_through));
 GetOptions('c|config=s' => \$rcfile)
@@ -22,11 +23,23 @@ GetOptions(
   't|tail=i' => \$tail,
   'callback=s' => \&setup_callback,
   'v|verbose!' => \$verbose,
+  'r|room=s' => \@want_rooms,
 ) or exit 100;
 
 my $campfire = Campfire->new($host, $auth);
 
-my @rooms = $campfire->presence;
+my @rooms;
+if (@want_rooms) {
+  my %index = map { $_ => 1 } @want_rooms;
+  @rooms = grep {
+             $index{$_->name} || $index{$_->id}
+           } $campfire->rooms;
+  $_->enter foreach @rooms;
+}
+else {
+  @rooms = $campfire->presence;
+}
+
 foreach my $room (@rooms) {
   print STDERR "Monitoring room: ", $room->name, "\n" if $verbose;
   $callback->($_, $room) foreach $room->recent($tail);
