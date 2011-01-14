@@ -2,7 +2,7 @@ use strict;
 use Campfire; # DEPEND
 use Getopt::Long;
 
-my $rcfile = "$ENV{HOME}/.campfirerc";
+my $rcfile = "$ENV{HOME}/.camptailrc";
 my $host;
 my $auth;
 my $tail = 10; # lines of backlog to show
