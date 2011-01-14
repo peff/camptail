@@ -53,4 +53,9 @@ sub _stream_cb {
   }
 }
 
+sub enter {
+  my $self = shift;
+  $self->{parent}->_post(join('/', 'room', $self->id, 'join'));
+}
+
 1;
