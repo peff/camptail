@@ -1,5 +1,6 @@
 use strict;
 use Campfire; # DEPEND
+use RoomState; # DEPEND
 use Getopt::Long;
 
 my $rcfile = "$ENV{HOME}/.camptailrc";
@@ -13,6 +14,7 @@ my @want_rooms_commandline;
 my $follow = 1;
 my $grep_before;
 my $grep_after;
+my $state_file;
 
 Getopt::Long::Configure(qw(bundling pass_through));
 GetOptions('c|config=s' => \$rcfile)
@@ -33,6 +35,7 @@ GetOptions(
   'v|verbose!' => \$verbose,
   'r|room=s' => \@want_rooms_commandline,
   'f|follow!' => \$follow,
+  'state=s' => \$state_file,
 ) or exit 100;
 
 my $campfire = Campfire->new($host, $auth);
@@ -52,8 +55,15 @@ else {
   @rooms = $campfire->presence;
 }
 
+my $state = RoomState->new;
+$state->load($state_file) if defined $state_file;
+
 foreach my $room (@rooms) {
-  $callback->($_, $room) foreach $room->recent($tail);
+  foreach my $message ($room->recent($tail, $state->last($room))) {
+    $callback->($message, $room);
+    $state->last($room, $message);
+  }
+
   if ($follow) {
     print STDERR "Monitoring room: ", $room->name, "\n" if $verbose;
     $room->enter;
@@ -63,6 +73,7 @@ foreach my $room (@rooms) {
 
 $campfire->run_streams if $follow;
 
+$state->save($state_file) if defined $state_file;
 exit 0;
 
 sub read_rcfile {
