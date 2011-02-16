@@ -9,6 +9,7 @@ my $tail = 10; # lines of backlog to show
 my $callback = \&print_message;
 my $verbose;
 my @want_rooms;
+my @want_rooms_commandline;
 my $follow = 1;
 
 Getopt::Long::Configure(qw(bundling pass_through));
@@ -24,11 +25,15 @@ GetOptions(
   't|tail=i' => \$tail,
   'callback=s' => \&setup_callback,
   'v|verbose!' => \$verbose,
-  'r|room=s' => \@want_rooms,
+  'r|room=s' => \@want_rooms_commandline,
   'f|follow!' => \$follow,
 ) or exit 100;
 
 my $campfire = Campfire->new($host, $auth);
+
+if (@want_rooms_commandline) {
+  @want_rooms = @want_rooms_commandline;
+}
 
 my @rooms;
 if (@want_rooms) {
