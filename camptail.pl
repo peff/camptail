@@ -24,6 +24,7 @@ GetOptions(
   'a|auth=s' => \$auth,
   't|tail=i' => \$tail,
   'callback=s' => \&setup_callback,
+  'print' => sub { $callback = \&print_message },
   'v|verbose!' => \$verbose,
   'r|room=s' => \@want_rooms_commandline,
   'f|follow!' => \$follow,
