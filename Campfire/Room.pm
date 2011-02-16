@@ -10,14 +10,12 @@ sub id { _accessor(id => @_) }
 sub recent {
   my $self = shift;
   my $limit = shift;
+  my $since = shift || $self->{last_message};
 
   my $xml = $self->{parent}->_get(
     join('/', 'room', $self->id, 'recent'),
     (defined $limit ? (limit => $limit) : ()),
-    (defined $self->{last_message} ?
-      (since_message_id => $self->{last_message}) :
-      ()
-    ),
+    (defined $since ? (since_message_id => $since) : ()),
   );
 
   return unless exists $xml->{messages}->{message};
