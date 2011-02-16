@@ -36,7 +36,6 @@ if (@want_rooms) {
   @rooms = grep {
              $index{$_->name} || $index{$_->id}
            } $campfire->rooms;
-  $_->enter foreach @rooms;
 }
 else {
   @rooms = $campfire->presence;
@@ -46,6 +45,7 @@ foreach my $room (@rooms) {
   $callback->($_, $room) foreach $room->recent($tail);
   if ($follow) {
     print STDERR "Monitoring room: ", $room->name, "\n" if $verbose;
+    $room->enter;
     $room->stream($callback);
   }
 }
