@@ -11,6 +11,8 @@ my $verbose;
 my @want_rooms;
 my @want_rooms_commandline;
 my $follow = 1;
+my $grep_before;
+my $grep_after;
 
 Getopt::Long::Configure(qw(bundling pass_through));
 GetOptions('c|config=s' => \$rcfile)
@@ -26,6 +28,8 @@ GetOptions(
   'callback=s' => \&setup_callback,
   'print' => sub { $callback = \&print_message },
   'grep=s' => \&setup_grep,
+  'B=i' => \$grep_before,
+  'A=i' => \$grep_after,
   'v|verbose!' => \$verbose,
   'r|room=s' => \@want_rooms_commandline,
   'f|follow!' => \$follow,
@@ -104,8 +108,26 @@ EOF
     $callback = \&grep_message;
   }
 
+  my @window;
+  my $want_after;
   sub grep_message {
     my ($message, $room) = @_;
-    print_message(@_) if $message->body =~ $re;
+
+    if ($message->body =~ $re) {
+      print_message(@$_) foreach @window;
+      print_message(@_);
+      @window = ();
+      $want_after = $grep_after;
+    }
+    elsif ($want_after) {
+      if ($want_after) {
+        print_message(@_);
+        $want_after--;
+      }
+    }
+    elsif ($grep_before) {
+      push @window, [@_];
+      shift @window while @window > $grep_before;
+    }
   }
 }
