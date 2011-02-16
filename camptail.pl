@@ -25,6 +25,7 @@ GetOptions(
   't|tail=i' => \$tail,
   'callback=s' => \&setup_callback,
   'print' => sub { $callback = \&print_message },
+  'grep=s' => \&setup_grep,
   'v|verbose!' => \$verbose,
   'r|room=s' => \@want_rooms_commandline,
   'f|follow!' => \$follow,
@@ -92,4 +93,19 @@ sub setup_callback {
   }
 EOF
   $@ and die $@;
+}
+
+{
+  my $re;
+
+  sub setup_grep {
+    my (undef, $pattern) = @_;
+    $re = qr/$pattern/i;
+    $callback = \&grep_message;
+  }
+
+  sub grep_message {
+    my ($message, $room) = @_;
+    print_message(@_) if $message->body =~ $re;
+  }
 }
