@@ -11,7 +11,7 @@ my $callback = \&print_message;
 my $verbose;
 my @want_rooms;
 my @want_rooms_commandline;
-my $follow = 1;
+my $follow = 0;
 my $grep_before;
 my $grep_after;
 my $state_file;
