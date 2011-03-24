@@ -28,6 +28,25 @@ sub recent {
   return @messages;
 }
 
+sub transcript {
+  my $self = shift;
+  my $ymd = shift;
+  my $since = shift;
+
+  my $xml = $self->{parent}->_get(
+    join('/', 'room', $self->id, 'transcript', $ymd)
+  );
+
+  return unless exists $xml->{messages}->{message};
+
+  my @messages = map { Campfire::Message->new_from_xml($_, $self->{parent}) }
+                 @{$xml->{messages}->{message}};
+  if (defined $since) {
+    @messages = grep { $_->id > $since } @messages;
+  }
+  return @messages;
+}
+
 sub stream {
   my $self = shift;
   my $cb = shift;
