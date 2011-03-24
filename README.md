@@ -84,8 +84,8 @@ My `.camptailrc` file looks something like this:
 Requirements
 ------------
 
-Camptail uses the WWW::Curl, XML::Smart, and URI perl modules. You can
-install them on Debian-ish systems with:
+Camptail uses the WWW::Curl, XML::Smart, DateTime, and URI perl modules.
+You can install them on Debian-ish systems with:
 
     sudo apt-get install libwww-perl libxml-smart-perl liburi-perl
 
