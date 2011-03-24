@@ -3,6 +3,8 @@ use Campfire; # DEPEND
 use RoomState; # DEPEND
 use Getopt::Long;
 
+binmode(STDOUT, ':utf8');
+
 my $rcfile = "$ENV{HOME}/.camptailrc";
 my $host;
 my $auth;
