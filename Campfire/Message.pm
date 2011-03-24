@@ -51,6 +51,9 @@ sub as_string {
     $body =~ s/^/  /mg;
     return '<' . $self->name . "> TWEET:\n" . $body;
   }
+  elsif ($type eq 'TopicChangeMessage') {
+    return '<' . $self->name . "> TOPIC: " . $self->body;
+  }
   else {
     return "unknown message type: $type" .
       ($ENV{CAMPFIRE_DEBUG} ?
