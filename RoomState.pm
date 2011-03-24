@@ -1,6 +1,7 @@
 package RoomState;
 use strict;
 use YAML qw();
+use DateTime;
 
 sub new {
   my $self = bless {}, shift;
@@ -43,6 +44,18 @@ sub last {
   $self->{data}->{$room->id}->{last} = $message->id
     if $message;
   return $self->{data}->{$room->id}->{last};
+}
+
+sub day {
+  my ($self, $room, $dt) = @_;
+  $self->{data}->{$room->id}->{day} = $dt->ymd
+    if $dt;
+
+  local $_ = $self->{data}->{$room->id}->{day};
+  return undef unless defined;
+  /(\d+)-(\d+)-(\d+)/
+    or die "bogus saved day format: $_";
+  return DateTime->new(year => $1, month => $2, day => $3);
 }
 
 1;

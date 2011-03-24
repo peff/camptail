@@ -15,6 +15,8 @@ my $follow = 0;
 my $grep_before;
 my $grep_after;
 my $state_file;
+my $all;
+my $days = 14;
 
 Getopt::Long::Configure(qw(bundling pass_through));
 GetOptions('c|config=s' => \$rcfile)
@@ -36,6 +38,8 @@ GetOptions(
   'r|room=s' => \@want_rooms_commandline,
   'f|follow!' => \$follow,
   'state=s' => \$state_file,
+  'all!' => \$all,
+  'd|days=i' => \$days,
 ) or exit 100;
 
 my $campfire = Campfire->new($host, $auth);
@@ -59,9 +63,24 @@ my $state = RoomState->new;
 $state->load($state_file) if defined $state_file;
 
 foreach my $room (@rooms) {
-  foreach my $message ($room->recent($tail, $state->last($room))) {
-    $callback->($message, $room);
-    $state->last($room, $message);
+  if ($all) {
+    my $day = $state->day($room) || DateTime->now->subtract(days => $days);
+    my $end = DateTime->now->add(days => 1)->truncate(to => 'day');
+    my $last = $state->last($room);
+    for (; $day < $end; $day->add(days => 1)) {
+      foreach my $message ($room->transcript($day->ymd('/'),
+                                             $state->last($room))) {
+        $callback->($message, $room);
+        $state->last($room, $message);
+      }
+    }
+    $state->day($room, DateTime->now);
+  }
+  else {
+    foreach my $message ($room->recent($tail, $state->last($room))) {
+      $callback->($message, $room);
+      $state->last($room, $message);
+    }
   }
 
   if ($follow) {
