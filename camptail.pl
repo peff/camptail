@@ -1,6 +1,7 @@
 use strict;
 use Campfire; # DEPEND
 use RoomState; # DEPEND
+use RoomFilter; # DEPEND
 use Getopt::Long;
 
 binmode(STDOUT, ':utf8');
@@ -46,20 +47,12 @@ GetOptions(
 
 my $campfire = Campfire->new($host, $auth);
 
-if (@want_rooms_commandline) {
-  @want_rooms = @want_rooms_commandline;
-}
-
-my @rooms;
-if (@want_rooms) {
-  my %index = map { $_ => 1 } @want_rooms;
-  @rooms = grep {
-             $index{$_->name} || $index{$_->id}
-           } $campfire->rooms;
-}
-else {
-  @rooms = $campfire->presence;
-}
+my @rooms =
+  @want_rooms_commandline ?
+    RoomFilter->new(@want_rooms_commandline)->filter($campfire->rooms) :
+  @want_rooms ?
+    RoomFilter->new(@want_rooms)->filter($campfire->rooms) :
+  $campfire->presence;
 
 my $state = RoomState->new;
 $state->load($state_file) if defined $state_file;
