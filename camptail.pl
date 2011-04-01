@@ -34,7 +34,8 @@ GetOptions(
   't|tail=i' => \$tail,
   'callback=s' => \&setup_callback,
   'print' => sub { $callback = \&print_message },
-  'grep=s' => \&setup_grep,
+  'grep=s' => \&setup_grep_re,
+  'grep-cb=s' => \&setup_grep_cb,
   'B=i' => \$grep_before,
   'A=i' => \$grep_after,
   'v|verbose!' => \$verbose,
@@ -134,11 +135,18 @@ sub setup_callback {
 }
 
 {
-  my $re;
+  my $grep_callback;
 
-  sub setup_grep {
+  sub setup_grep_re {
     my (undef, $pattern) = @_;
-    $re = qr/$pattern/i;
+    my $re = qr/$pattern/i;
+    $grep_callback = sub { $_[0]->body =~ $re };
+    $callback = \&grep_message;
+  }
+
+  sub setup_grep_cb {
+    my (undef, $code) = @_;
+    $grep_callback = make_callback($code);
     $callback = \&grep_message;
   }
 
@@ -147,7 +155,7 @@ sub setup_callback {
   sub grep_message {
     my ($message, $room) = @_;
 
-    if ($message->body =~ $re) {
+    if ($grep_callback->(@_)) {
       print_message(@$_) foreach @window;
       print_message(@_);
       @window = ();
