@@ -113,18 +113,24 @@ sub read_rcfile {
   }
 }
 
-sub setup_callback {
-  my (undef, $code) = @_;
+sub make_callback {
+  my $code = shift;
   if ($code =~ /^[A-za-z0-9_]+$/) {
     $code .= '(@_)';
   }
-  $callback = eval <<EOF;
+  my $sub = eval <<EOF;
   sub {
     my (\$message, \$room) = \@_;
     $code
   }
 EOF
   $@ and die $@;
+  return $sub;
+}
+
+sub setup_callback {
+  my (undef, $code) = @_;
+  $callback = make_callback($code);
 }
 
 {
