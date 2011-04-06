@@ -152,8 +152,15 @@ sub setup_callback {
 
   my @window;
   my $want_after;
+  my $old_room;
   sub grep_message {
     my ($message, $room) = @_;
+
+    if (!defined $old_room || $old_room->id != $room->id) {
+      @window = ();
+      $want_after = 0;
+      $old_room = $room;
+    }
 
     if ($grep_callback->(@_)) {
       print_message(@$_) foreach @window;
