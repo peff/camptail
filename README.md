@@ -92,8 +92,16 @@ You can install them on Debian-ish systems with:
 Installation
 ------------
 
-There is a build system, but it uses my as-yet-unreleased "mfm" makefile
-creation tool. However, you can run it from the source directory with:
+To build from the git repository, you will need the `mfm` tool. You can
+get it here: <http://github.com/peff/mfm>
+
+Then run:
+
+    mfm
+    make
+    make install
+
+Alternatively, you can run without building from the camptail directory:
 
     perl camptail.pl
 
