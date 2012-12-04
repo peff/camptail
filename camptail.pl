@@ -61,7 +61,8 @@ $state->load($state_file) if defined $state_file;
 foreach my $room (@rooms) {
   if ($all) {
     my $day = $state->day($room) || DateTime->now->subtract(days => $days);
-    my $end = DateTime->now->add(days => 1)->truncate(to => 'day');
+    $day->subtract(days => 1);
+    my $end = DateTime->now->add(days => 2)->truncate(to => 'day');
     my $last = $state->last($room);
     for (; $day < $end; $day->add(days => 1)) {
       foreach my $message ($room->transcript($day->ymd('/'),
