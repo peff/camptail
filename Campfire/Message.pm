@@ -32,6 +32,9 @@ sub as_string {
   elsif ($type eq 'EnterMessage') {
     return $self->name . ' enters';
   }
+  elsif ($type eq 'LeaveMessage') {
+    return $self->name . ' leaves';
+  }
   elsif ($type eq 'TextMessage') {
     return '<' . $self->name . '> ' . $self->body;
   }
