@@ -47,9 +47,10 @@ sub _get {
   $url->query_form(@_);
 
   my $body;
+  open(my $fh, '>', \$body);
   $self->{curl}->setopt(CURLOPT_URL, $url);
   $self->{curl}->setopt(CURLOPT_POST, 0);
-  $self->{curl}->setopt(CURLOPT_WRITEDATA, \$body);
+  $self->{curl}->setopt(CURLOPT_WRITEDATA, \$fh);
 
   my $r = $self->{curl}->perform;
   $r == 0
