@@ -10,7 +10,7 @@ sub new_from_xml {
 
 sub _accessor {
   my ($what, $self) = @_;
-  return $self->{xml}->{$what}->content;
+  return scalar($self->{xml}->{$what}->content);
 }
 
 1;
