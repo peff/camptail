@@ -1,6 +1,16 @@
 camptail - a simple tail for campfire rooms
 ===========================================
 
+NOTE
+----
+
+This software is no longer actively maintained. It worked fine the last
+time I used it, but as my workplace switched from Campfire to Slack, it
+has been several years since I've even tried to run. Caveat emptor!
+
+Introduction
+------------
+
 Camptail is an absurdly simplistic tail-like program for tracking the
 output of campfire rooms. It connects to the campfire server, looks at
 each room you are currently in, outputs a configurable number of backlog
